@@ -229,6 +229,7 @@ describe("app", () => {
     });
     test("return 400 for invalid article ID", () => {
       const article_id = "Hello";
+
       return request(app)
         .get(`/api/articles/${article_id}/comments`)
         .expect(400)
@@ -249,7 +250,7 @@ describe("app", () => {
 
 // Ticket 7
 // describe("CORE: POST /api/articles/:article_id/comments", () => {
-//   test.only("responds with 201 and the posted comment", () => {
+//   test("responds with 201 and the posted comment", () => {
 //     const article_id = 1;
 //     const newComment = {
 //       username: "butter_bridge",
@@ -260,7 +261,41 @@ describe("app", () => {
 //       .send(newComment)
 //       .expect(201)
 //       .then(({ body }) => {
-//         expect(body.comment).toMatchObject(newComment);
+//         const comment = body.comment;
+//         console.log(comment);
+//         expect(comment).toHaveProperty("body", newComment.body);
+//         expect(comment).toHaveProperty("article_id", article_id);
+//         expect(comment).toHaveProperty("author", newComment.username);
+//         expect(comment).toHaveProperty("votes", 0);
+//         expect(comment).toHaveProperty("created_at");
+//       });
+//   });
+//   test.only("returns 400 for invalid article id ", () => {
+//     const article_id = "bananas";
+//     const newComment = {
+//       username: "butter_bridge",
+//       body: "This is a new comment",
+//     };
+//     return request(app)
+//       .post(`/api/articles/${article_id}/comments`)
+//       .send(newComment)
+//       .expect(400)
+//       .then(({ body }) => {
+//         expect(body.msg).toBe("Bad Request");
+//       });
+//   });
+//   test("returns 404 for article id not found in the database ", () => {
+//     const article_id = 9999;
+//     const newComment = {
+//       username: "butter_bridge",
+//       body: "This is a new comment",
+//     };
+//     return request(app)
+//       .post(`/api/articles/${article_id}/comments`)
+//       .send(newComment)
+//       .expect(404)
+//       .then(({ body }) => {
+//         expect(body.msg).toBe("Article not found");
 //       });
 //   });
 // });
