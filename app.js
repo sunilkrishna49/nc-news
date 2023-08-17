@@ -8,14 +8,18 @@ const { getArticles } = require("./controllers/apiArticlesController");
 const {
   getSingleArticleComments,
 } = require("./controllers/apiArticleIDCommentsController");
+const { postComment } = require("./controllers/postCommentController");
 
 const app = express();
+
+app.use(express.json());
 
 app.get("/api", getApiEndPoints);
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getSinlgeArticle);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getSingleArticleComments);
+app.post("/api/articles/:article_id/comments", postComment);
 
 app.use((err, req, res, next) => {
   if (err.status === 404) {

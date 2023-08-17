@@ -141,29 +141,42 @@ describe("app", () => {
           });
       });
 
-      test("200: Returns an array of articles sorted by date in descending order with comment_count for every article", () => {
+      test("should have a comment_count property for every article", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
           .then((response) => {
             const { articles } = response.body;
-            const dates = articles.map((article) => {
-              return article.created_at;
+            articles.forEach((article) => {
+              expect(article).toHaveProperty("comment_count");
             });
-            const expected = {
-              author: "icellusedkars",
-              title: "Eight pug gifs that remind me of mitch",
-              article_id: 3,
-              topic: "mitch",
-              created_at: new Date("2020-11-03T09:12:00.000Z").toISOString(),
-              votes: 0,
-              article_img_url:
-                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-              comment_count: "2",
-            };
-            expect(articles[0]).toEqual(expected);
           });
       });
+      test("should have the correct comment_count for each article", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then((response) => {
+            const { articles } = response.body;
+            expect(articles[0].comment_count).toBe("2");
+          });
+      });
+    });
+    test("articles should be sorted by date in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          const { articles } = response.body;
+          const dates = articles.map((article) => {
+            return new Date(article.created_at);
+          });
+          for (let i = 0; i < dates.length - 1; i++) {
+            expect(dates[i].getTime()).toBeGreaterThanOrEqual(
+              dates[i + 1].getTime()
+            );
+          }
+        });
     });
   });
 });
@@ -234,20 +247,20 @@ describe("app", () => {
   });
 });
 
-// //Ticket 7
+//Ticket 7
 // describe("CORE: POST /api/articles/:article_id/comments", () => {
-//   test("responds with 201 and the posted comment", () => {
+//   test.only("responds with 201 and the posted comment", () => {
 //     const article_id = 1;
 //     const newComment = {
-//       username: "abc",
-//       body: "this is new comment",
+//       username: "butter_bridge",
+//       body: "This is a new comment",
 //     };
 //     return request(app)
 //       .post(`/api/articles/${article_id}/comments`)
-//       .send()
+//       .send(newComment)
 //       .expect(201)
-//       .then(({ response }) => {
-//         console.log(response);
+//       .then(({ body }) => {
+//         expect(body.comment).toMatchObject(newComment);
 //       });
 //   });
 // });
