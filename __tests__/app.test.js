@@ -81,16 +81,22 @@ describe("app", () => {
 
     test("returns 400 status for invalid input", () => {
       const article_id = "Hello";
-      return request(app).get(`/api/articles/${article_id}`);
-      expect(res.status).toBe(400);
-      expect(res.body.message).toBe("Bad Request");
+      return request(app)
+        .get(`/api/articles/${article_id}`)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
     });
 
     test("returns 404 status code for non-existent article", () => {
       const article_id = 9999;
-      return request(app).get(`/api/articles/${article_id}`);
-      expect(res.status).toBe(404);
-      expect(res.body.message).toBe("Article not found");
+      return request(app)
+        .get(`/api/articles/${article_id}`)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Article not found");
+        });
     });
   });
 
@@ -210,16 +216,38 @@ describe("app", () => {
     });
     test("return 400 for invalid article ID", () => {
       const article_id = "Hello";
-      return request(app).get(`/api/articles/${article_id}/comments`);
-      expect(res.status).toBe(400);
-      expect(res.body.message).toBe("Bad Request");
+      return request(app)
+        .get(`/api/articles/${article_id}/comments`)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
     });
 
     test("return 404 for a non-existent article", () => {
       const article_id = 9999;
       return request(app).get(`/api/articles/${article_id}/comments`);
-      expect(res.status).toBe(404);
-      expect(res.body.message).toBe("Article not found");
+      expect(404).then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
     });
   });
 });
+
+// //Ticket 7
+// describe("CORE: POST /api/articles/:article_id/comments", () => {
+//   test("responds with 201 and the posted comment", () => {
+//     const article_id = 1;
+//     const newComment = {
+//       username: "abc",
+//       body: "this is new comment",
+//     };
+//     return request(app)
+//       .post(`/api/articles/${article_id}/comments`)
+//       .send()
+//       .expect(201)
+//       .then(({ response }) => {
+//         console.log(response);
+//       });
+//   });
+// });

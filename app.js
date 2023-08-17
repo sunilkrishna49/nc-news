@@ -18,8 +18,24 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getSingleArticleComments);
 
 app.use((err, req, res, next) => {
+  if (err.status === 404) {
+    res.status(404).send(err);
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "Bad Request" });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
   console.log(err);
-  res.stats(500).send({ msg: err });
+  res.status(500).send({ msg: err });
 });
 
 module.exports = app;
