@@ -247,7 +247,7 @@ describe("app", () => {
   });
 });
 
-//Ticket 7
+// Ticket 7
 // describe("CORE: POST /api/articles/:article_id/comments", () => {
 //   test.only("responds with 201 and the posted comment", () => {
 //     const article_id = 1;
