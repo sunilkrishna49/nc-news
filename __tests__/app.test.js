@@ -343,6 +343,32 @@ describe("app", () => {
     });
   });
 
+  //Ticket 9
+  describe("CORE: DELETE /api/comments/:comment_id", () => {
+    test("should return status code of 201", () => {
+      const comment_id = 1;
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(response.status).toBe(201);
+    });
+    test("deletes the comment and responds with status 204", () => {
+      const comment_id = 1;
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(204).then((body) => {
+        expect(body.msg).toBe("no content");
+      });
+    });
+    test("responds with a status 404 for deleting a non-existent comment", () => {
+      const comment_id = "nonexistenceid";
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(response.status).toBe(404);
+    });
+    test("responds with a status 400 for deleting with a invalid comment id", () => {
+      const comment_id = "bananas";
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(response.status).toBe(400);
+    });
+  });
+
   //Ticket 10
   describe("get /api/users", () => {
     test("return request 200: returns status code", () => {
