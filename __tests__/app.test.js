@@ -35,22 +35,21 @@ describe("app", () => {
         });
     });
   });
-});
 
-//Ticket 3
-describe("app", () => {
-  test("should return an object describing all available endpoints", () => {
-    return request(app)
-      .get("/api")
-      .expect(200)
-      .then((response) => {
-        expect(response.body).toEqual(endpointsData);
-      });
+  //Ticket 3
+  describe("CORE: GET /api", () => {
+    test("should return an object describing all available endpoints", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then((response) => {
+          expect(response.body).toEqual(endpointsData);
+        });
+    });
   });
-});
 
-//Ticket 4
-describe("app", () => {
+  //Ticket 4
+
   describe("GET /api/articles/:article_id", () => {
     test("return request 200: returns status code", () => {
       const articleID = 1;
@@ -101,75 +100,87 @@ describe("app", () => {
   });
 
   //Ticket 5
-  describe("app", () => {
-    describe("get api/articles", () => {
-      test("return request 200: returns status code", () => {
-        return request(app).get("/api/articles").expect(200);
-      });
 
-      test("return articles with correct properties ", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then((response) => {
-            const { articles } = response.body;
-            expect(Array.isArray(articles)).toBe(true);
-            expect(articles.length).toBe(13);
-            articles.forEach((article) => {
-              expect(article).toMatchObject({
-                author: expect.any(String),
-                title: expect.any(String),
-                article_id: expect.any(Number),
-                topic: expect.any(String),
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-                article_img_url: expect.any(String),
-              });
+  describe("get api/articles", () => {
+    test("return request 200: returns status code", () => {
+      return request(app).get("/api/articles").expect(200);
+    });
+
+    test("return articles with correct properties ", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          const { articles } = response.body;
+          expect(Array.isArray(articles)).toBe(true);
+          expect(articles.length).toBe(13);
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
             });
           });
-      });
+        });
+    });
 
-      test("does not contain body property", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then((response) => {
-            const { articles } = response.body;
-            articles.forEach((article) => {
-              expect(article.body).toBeUndefined();
-            });
+    test("does not contain body property", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          const { articles } = response.body;
+          articles.forEach((article) => {
+            expect(article.body).toBeUndefined();
           });
-      });
+        });
+    });
 
-      test("200: Returns an array of articles sorted by date in descending order with comment_count for every article", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then((response) => {
-            const { articles } = response.body;
-            const dates = articles.map((article) => {
-              return article.created_at;
-            });
-            const expected = {
-              author: "icellusedkars",
-              title: "Eight pug gifs that remind me of mitch",
-              article_id: 3,
-              topic: "mitch",
-              created_at: new Date("2020-11-03T09:12:00.000Z").toISOString(),
-              votes: 0,
-              article_img_url:
-                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-              comment_count: "2",
-            };
-            expect(articles[0]).toEqual(expected);
+    test("should have a comment_count property for every article", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          const { articles } = response.body;
+          articles.forEach((article) => {
+            expect(article).toHaveProperty("comment_count");
           });
-      });
+        });
+    });
+    test("should have the correct comment_count for each article", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          const { articles } = response.body;
+          expect(articles[0].comment_count).toBe("2");
+        });
+    });
+
+    test("articles should be sorted by date in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((response) => {
+          const { articles } = response.body;
+          const dates = articles.map((article) => {
+            return new Date(article.created_at);
+          });
+          for (let i = 0; i < dates.length - 1; i++) {
+            expect(dates[i].getTime()).toBeGreaterThanOrEqual(
+              dates[i + 1].getTime()
+            );
+          }
+        });
     });
   });
-});
 
-//Ticket 6
-describe("app", () => {
+  //Ticket 6
+
   describe("GET /api/articles/:article_id/comments", () => {
     test("responds with 200: returns status code", () => {
       const article_id = 1;
@@ -216,6 +227,7 @@ describe("app", () => {
     });
     test("return 400 for invalid article ID", () => {
       const article_id = "Hello";
+
       return request(app)
         .get(`/api/articles/${article_id}/comments`)
         .expect(400)
@@ -232,22 +244,127 @@ describe("app", () => {
       });
     });
   });
-});
 
-// //Ticket 7
-// describe("CORE: POST /api/articles/:article_id/comments", () => {
-//   test("responds with 201 and the posted comment", () => {
-//     const article_id = 1;
-//     const newComment = {
-//       username: "abc",
-//       body: "this is new comment",
-//     };
-//     return request(app)
-//       .post(`/api/articles/${article_id}/comments`)
-//       .send()
-//       .expect(201)
-//       .then(({ response }) => {
-//         console.log(response);
-//       });
-//   });
-// });
+  // Ticket 7
+
+  describe("CORE: POST /api/articles/:article_id/comments", () => {
+    test("responds with 201 and the posted comment", () => {
+      const article_id = 1;
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a new comment",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const comment = body.comment;
+          expect(comment).toHaveProperty("body", newComment.body);
+          expect(comment).toHaveProperty("article_id", article_id);
+          expect(comment).toHaveProperty("author", newComment.username);
+          expect(comment).toHaveProperty("votes", 0);
+          expect(comment).toHaveProperty("created_at");
+        });
+    });
+    test("returns 400 for invalid article id ", () => {
+      const article_id = "bananas";
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a new comment",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("returns 404 for article id not found in the database ", () => {
+      const article_id = 9999;
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a new comment",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Violation of foreign key");
+        });
+    });
+    test("responds with 201 and the posted comment while ignoring extra properties", () => {
+      const article_id = 1;
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a new comment",
+        extraProperty: "someValue",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const comment = body.comment;
+          expect(comment).toHaveProperty("body", newComment.body);
+          expect(comment).toHaveProperty("article_id", article_id);
+          expect(comment).toHaveProperty("author", newComment.username);
+          expect(comment).toHaveProperty("votes", 0);
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).not.toHaveProperty("extraProperty");
+        });
+    });
+    test("returns 400 when required fields are missing ", () => {
+      const article_id = 1;
+      const newComment = {};
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("returns 404 when the given username is not found", () => {
+      const article_id = 1;
+      const newComment = {
+        username: "sunil",
+        body: "This is a new comment",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Violation of foreign key");
+        });
+    });
+  });
+
+  //Ticket 10
+  describe("get /api/users", () => {
+    test("return request 200: returns status code", () => {
+      return request(app).get("/api/users").expect(200);
+    });
+    test("return users", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then((response) => {
+          console.log(response.body);
+          const { users } = response.body;
+          expect(Array.isArray(users)).toBe(true);
+          expect(users.length).toBe(4);
+          users.forEach((user) => {
+            expect(user).toMatchObject({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
