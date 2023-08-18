@@ -249,53 +249,64 @@ describe("app", () => {
 });
 
 // Ticket 7
-// describe("CORE: POST /api/articles/:article_id/comments", () => {
-//   test("responds with 201 and the posted comment", () => {
-//     const article_id = 1;
-//     const newComment = {
-//       username: "butter_bridge",
-//       body: "This is a new comment",
-//     };
-//     return request(app)
-//       .post(`/api/articles/${article_id}/comments`)
-//       .send(newComment)
-//       .expect(201)
-//       .then(({ body }) => {
-//         const comment = body.comment;
-//         console.log(comment);
-//         expect(comment).toHaveProperty("body", newComment.body);
-//         expect(comment).toHaveProperty("article_id", article_id);
-//         expect(comment).toHaveProperty("author", newComment.username);
-//         expect(comment).toHaveProperty("votes", 0);
-//         expect(comment).toHaveProperty("created_at");
-//       });
-//   });
-//   test.only("returns 400 for invalid article id ", () => {
-//     const article_id = "bananas";
-//     const newComment = {
-//       username: "butter_bridge",
-//       body: "This is a new comment",
-//     };
-//     return request(app)
-//       .post(`/api/articles/${article_id}/comments`)
-//       .send(newComment)
-//       .expect(400)
-//       .then(({ body }) => {
-//         expect(body.msg).toBe("Bad Request");
-//       });
-//   });
-//   test("returns 404 for article id not found in the database ", () => {
-//     const article_id = 9999;
-//     const newComment = {
-//       username: "butter_bridge",
-//       body: "This is a new comment",
-//     };
-//     return request(app)
-//       .post(`/api/articles/${article_id}/comments`)
-//       .send(newComment)
-//       .expect(404)
-//       .then(({ body }) => {
-//         expect(body.msg).toBe("Article not found");
-//       });
-//   });
-// });
+describe("app", () => {
+  describe("CORE: POST /api/articles/:article_id/comments", () => {
+    test.only("responds with 201 and the posted comment", () => {
+      const article_id = 1;
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a new comment",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const comment = body.comment;
+          expect(comment).toHaveProperty("body", newComment.body);
+          expect(comment).toHaveProperty("article_id", article_id);
+          expect(comment).toHaveProperty("author", newComment.username);
+          expect(comment).toHaveProperty("votes", 0);
+          expect(comment).toHaveProperty("created_at");
+        });
+    });
+    test("returns 400 for invalid article id ", () => {
+      const article_id = "bananas";
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a new comment",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("returns 404 for article id not found in the database ", () => {
+      const article_id = 9999;
+      const newComment = {
+        username: "butter_bridge",
+        body: "This is a new comment",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Article not found");
+        });
+    });
+  });
+});
+
+//Ticket 9 : Delete Comments by Comment Id
+describe("app", () => {
+  describe("CORE: DELETE /api/comments/:comment_id", () => {
+    const comment_id = 1;
+    test("returns expected response status code with 201 ", () => {
+      return request(app).delete(`$api/comments/${comment_id}`).expect(201);
+    });
+  });
+});

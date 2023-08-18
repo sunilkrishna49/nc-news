@@ -9,6 +9,9 @@ const {
   getSingleArticleComments,
 } = require("./controllers/apiArticleIDCommentsController");
 const { postComment } = require("./controllers/postCommentController");
+const {
+  deleteCommentByIdController,
+} = require("./controllers/deleteCommentsByIdController");
 
 const app = express();
 
@@ -20,10 +23,11 @@ app.get("/api/articles/:article_id", getSinlgeArticle);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getSingleArticleComments);
 app.post("/api/articles/:article_id/comments", postComment);
+app.delete("/api/comments/:comment_id", deleteCommentByIdController);
 
 app.use((err, req, res, next) => {
-  if (err.status === 404) {
-    res.status(404).send(err);
+  if (err.status === 404 || err.code === "23503") {
+    res.status(404).send({ msg: "Article not found" });
   } else {
     next(err);
   }
