@@ -355,7 +355,7 @@ describe("app", () => {
   });
   //Ticket 8
   describe("CORE: PATCH /api/articles/:article_id", () => {
-    test.only("return 200: returns status code for a patch request", () => {
+    test("return 200: returns status code for a patch request", () => {
       const article_id = 1;
       const updateData = { inc_votes: 5 };
       return request(app)
@@ -363,7 +363,7 @@ describe("app", () => {
         .send(updateData)
         .expect(200);
     });
-    test.only("Updates an article's votes and responds with the updated article", () => {});
+    test("Updates an article's votes and responds with the updated article", () => {});
   });
 
   //Ticket 9
