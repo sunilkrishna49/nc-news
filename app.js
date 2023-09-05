@@ -20,6 +20,8 @@ const {
 
 const app = express();
 
+app.use(cors());
+
 app.use(express.json());
 
 app.get("/api", getApiEndPoints);
@@ -31,8 +33,6 @@ app.post("/api/articles/:article_id/comments", postComment);
 app.delete("/api/comments/:comment_id", deleteCommentByIdController);
 app.get("/api/users", getUsers);
 app.patch("/api/articles/:article_id", patchArticleVotes);
-
-app.use(cors());
 
 app.use((err, req, res, next) => {
   if (err.status === 404) {
