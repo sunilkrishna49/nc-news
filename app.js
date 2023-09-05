@@ -1,3 +1,4 @@
+const cors = require("cors");
 const express = require("express");
 const { getApiEndPoints } = require("./controllers/apiEndPointController");
 const { getTopics } = require("./controllers/topicsControllers");
@@ -30,6 +31,8 @@ app.post("/api/articles/:article_id/comments", postComment);
 app.delete("/api/comments/:comment_id", deleteCommentByIdController);
 app.get("/api/users", getUsers);
 app.patch("/api/articles/:article_id", patchArticleVotes);
+
+app.use(cors());
 
 app.use((err, req, res, next) => {
   if (err.status === 404) {
