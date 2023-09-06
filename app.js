@@ -14,6 +14,9 @@ const {
   deleteCommentByIdController,
 } = require("./controllers/deleteCommentsByIdController");
 const { getUsers } = require("./controllers/getApiUsersController");
+const {
+  patchArticleVotes,
+} = require("./controllers/patchApiArticleByIdController");
 
 const app = express();
 
@@ -29,6 +32,7 @@ app.get("/api/articles/:article_id/comments", getSingleArticleComments);
 app.post("/api/articles/:article_id/comments", postComment);
 app.delete("/api/comments/:comment_id", deleteCommentByIdController);
 app.get("/api/users", getUsers);
+app.patch("/api/articles/:article_id", patchArticleVotes);
 
 app.use((err, req, res, next) => {
   if (err.status === 404) {

@@ -177,71 +177,82 @@ describe("app", () => {
           }
         });
     });
-  });
 
-  //Ticket 6
+    //Ticket 6
 
-  describe("GET /api/articles/:article_id/comments", () => {
-    test("responds with 200: returns status code", () => {
-      const article_id = 1;
-      return request(app)
-        .get(`/api/articles/${article_id}/comments`)
-        .expect(200);
-    });
-    test("200: Returns comments with correct properties for the particular article", () => {
-      const article_id = 1;
-      return request(app)
-        .get(`/api/articles/${article_id}/comments`)
-        .expect(200)
-        .then((response) => {
-          const { comments } = response.body;
-          expect(Array.isArray(comments)).toBe(true);
-          comments.forEach((comment) => {
-            expect(comment).toMatchObject({
-              comment_id: expect.any(Number),
-              votes: expect.any(Number),
-              created_at: expect.any(String),
-              author: expect.any(String),
-              body: expect.any(String),
-              article_id: expect.any(Number),
+    describe("GET /api/articles/:article_id/comments", () => {
+      test("responds with 200: returns status code", () => {
+        const article_id = 1;
+        return request(app)
+          .get(`/api/articles/${article_id}/comments`)
+          .expect(200);
+      });
+      test("200: Returns comments with correct properties for the particular article", () => {
+        const article_id = 1;
+        return request(app)
+          .get(`/api/articles/${article_id}/comments`)
+          .expect(200)
+          .then((response) => {
+            const { comments } = response.body;
+            expect(Array.isArray(comments)).toBe(true);
+            expect(comments.length).not.toBe(0);
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                article_id: expect.any(Number),
+              });
             });
           });
-        });
-    });
-    test("200: Returns comments sorted by date in descending order", () => {
-      const article_id = 1;
-      return request(app)
-        .get(`/api/articles/${article_id}/comments`)
-        .expect(200)
-        .then((response) => {
-          const { comments } = response.body;
-          const dates = comments.map((comment) => {
-            return new Date(comment.created_at);
-          });
-          for (let i = 0; i < dates.length - 1; i++) {
-            expect(dates[i].getTime()).toBeGreaterThanOrEqual(
-              dates[i + 1].getTime()
-            );
-          }
-        });
-    });
-    test("return 400 for invalid article ID", () => {
-      const article_id = "Hello";
-
-      return request(app)
-        .get(`/api/articles/${article_id}/comments`)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-
-    test("return 404 for a non-existent article", () => {
-      const article_id = 9999;
-      return request(app).get(`/api/articles/${article_id}/comments`);
-      expect(404).then(({ body }) => {
-        expect(body.msg).toBe("Article not found");
       });
+      test("200: Returns comments sorted by date in descending order", () => {
+        const article_id = 1;
+        return request(app)
+          .get(`/api/articles/${article_id}/comments`)
+          .expect(200)
+          .then((response) => {
+            const { comments } = response.body;
+            const dates = comments.map((comment) => {
+              return new Date(comment.created_at);
+            });
+            for (let i = 0; i < dates.length - 1; i++) {
+              expect(dates[i].getTime()).toBeGreaterThanOrEqual(
+                dates[i + 1].getTime()
+              );
+            }
+          });
+      });
+      test("return 400 for invalid article ID", () => {
+        const article_id = "Hello";
+
+        return request(app)
+          .get(`/api/articles/${article_id}/comments`)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request");
+          });
+      });
+
+      test("return 404 for a non-existent article", () => {
+        const article_id = 9999;
+        return request(app).get(`/api/articles/${article_id}/comments`);
+        expect(404).then(({ body }) => {
+          expect(body.msg).toBe("Article not found");
+        });
+      });
+
+      // test.only("returns 200 if an article has no comments", () => {
+      //   const article_id = 8;
+      //   return request(app)
+      //     .get(`/api/articles/${article_id}/comments`)
+      //     .expect(200)
+      //     .then(({ body }) => {
+      //       expect(body.comments).toEqual([]);
+      //     });
+      // });
     });
   });
 
@@ -342,6 +353,44 @@ describe("app", () => {
         });
     });
   });
+  //Ticket 8
+  describe("CORE: PATCH /api/articles/:article_id", () => {
+    test("return 200: returns status code for a patch request", () => {
+      const article_id = 1;
+      const updateData = { inc_votes: 5 };
+      return request(app)
+        .patch(`/api/articles/${article_id}`)
+        .send(updateData)
+        .expect(200);
+    });
+    test("Updates an article's votes and responds with the updated article", () => {});
+  });
+
+  //Ticket 9
+  describe("CORE: DELETE /api/comments/:comment_id", () => {
+    test("should return status code of 201", () => {
+      const comment_id = 1;
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(response.status).toBe(201);
+    });
+    test("deletes the comment and responds with status 204", () => {
+      const comment_id = 1;
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(204).then((body) => {
+        expect(body.msg).toBe("no content");
+      });
+    });
+    test("responds with a status 404 for deleting a non-existent comment", () => {
+      const comment_id = "nonexistenceid";
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(response.status).toBe(404);
+    });
+    test("responds with a status 400 for deleting with a invalid comment id", () => {
+      const comment_id = "bananas";
+      return request(app).delete(`/api/comments/${comment_id}`);
+      expect(response.status).toBe(400);
+    });
+  });
 
   //Ticket 10
   describe("get /api/users", () => {
@@ -353,7 +402,6 @@ describe("app", () => {
         .get("/api/users")
         .expect(200)
         .then((response) => {
-          console.log(response.body);
           const { users } = response.body;
           expect(Array.isArray(users)).toBe(true);
           expect(users.length).toBe(4);
